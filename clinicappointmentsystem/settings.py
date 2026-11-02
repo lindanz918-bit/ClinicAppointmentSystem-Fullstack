@@ -140,15 +140,25 @@ MAILERS = {
 LOGIN_REDIRECT_URL = 'patient_book_list'
 LOGOUT_REDIRECT_URL = 'login'
 
+# CSRF_TRUSTED_ORIGINS = [
+#     'https://iscg7420wad-assignment1.onrender.com',
+#     'https://*.onrender.com',
+#     'http://127.0.0.1',
+#     'http://localhost',
+# ]
+
 CSRF_TRUSTED_ORIGINS = [
     'https://iscg7420wad-assignment1.onrender.com',
     'https://*.onrender.com',
-    'http://127.0.0.1',
-    'http://localhost',
+    'http://127.0.0.1:3000',
+    'http://localhost:3000',
+    'http://127.0.0.1:8000',
+    'http://localhost:8000',
 ]
 
 CSRF_COOKIE_SAMESITE = 'Lax'
 SESSION_COOKIE_SAMESITE = 'Lax'
+
 
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOWED_ORIGINS = [
@@ -168,3 +178,5 @@ REST_FRAMEWORK = {
 if not DEBUG:
     CSRF_COOKIE_SECURE = True
     SESSION_COOKIE_SECURE = True
+
+

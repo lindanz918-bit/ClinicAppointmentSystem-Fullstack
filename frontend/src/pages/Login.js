@@ -12,10 +12,9 @@ function Login({ setUser }) {
     e.preventDefault();
     setError('');
     try {
-      const res = await axios.post(`${process.env.REACT_APP_API_BASE_URL}/api/auth/login/`, {
-        username,
-        password,
-      });
+      const res = await axios.post(`${process.env.REACT_APP_API_BASE_URL}/api/auth/login/`,
+          {username, password,},
+          { withCredentials: true });
       setUser(res.data.user);
       localStorage.setItem('user', JSON.stringify(res.data.user));
       navigate('/');

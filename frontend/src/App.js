@@ -10,6 +10,12 @@ import Register from "./pages/Register";
 import PasswordChanged from "./pages/PasswordChanged";
 import AdminDoctorList from "./pages/AdminDoctorList";
 import AdminDoctorForm from "./pages/AdminDoctorForm";
+import AdminSlotList from "./pages/AdminSlotList";
+import AdminUserList from "./pages/AdminUserList";
+import AdminSlotForm from "./pages/AdminSlotForm";
+import AdminAddBooking from "./pages/AdminAddBooking";
+import AdminEditBooking from "./pages/AdminEditBooking";
+import AdminUserForm from "./pages/AdminUserForm";
 
 function App() {
     // use null to simulate unlogged, use real login later
@@ -33,9 +39,21 @@ function App() {
                         <Route path="/change-password" element={<ChangePassword user={user}/>}/>
                         <Route path="/password-changed" element={<PasswordChanged user={user}/>}/>
                         <Route path="/admin/bookings" element={<AdminBookingList/>}/>
+                        <Route path="/admin/bookings/add" element={<AdminAddBooking />} />
+                        <Route path="/admin/bookings/edit/:id" element={<AdminEditBooking />} />
+
                         <Route path="/admin/doctors" element={<AdminDoctorList/>}/>
                         <Route path="/admin/doctors/add" element={<AdminDoctorForm/>}/>
                         <Route path="/admin/doctors/edit/:id" element={<AdminDoctorForm/>}/>
+
+                        <Route path="/admin/slots" element={<AdminSlotList/>}/>
+                        <Route path="/admin/slots/add" element={<AdminSlotForm/>}/>
+                        <Route path="/admin/slots/edit/:id" element={<AdminSlotForm/>}/>
+
+                        <Route path="/admin/users" element={<AdminUserList/>}/>
+                        <Route path="/admin/users/add" element={<AdminUserForm/>}/>
+                        <Route path="/admin/users/edit/:id" element={<AdminUserForm/>}/>
+
                         <Route path="/login" element={<div>Login Page (coming soon)</div>}/>
                         <Route path="/register" element={<div>Register Page (coming soon)</div>}/>
                         <Route path="/available-slots" element={<div>Available Slots (coming soon)</div>}/>
