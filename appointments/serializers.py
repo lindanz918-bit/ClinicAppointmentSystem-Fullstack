@@ -1,14 +1,16 @@
+from django.db import IntegrityError
 from rest_framework import serializers
 from django.contrib.auth.models import User, Group
+from rest_framework.exceptions import ValidationError
+
 from .models import Doctor, AppointmentSlot, Booking
-
-
 
 
 class GroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = Group
         fields = ['id', 'name']
+
 
 class UserSerializer(serializers.ModelSerializer):
     groups = GroupSerializer(many=True, read_only=True)
@@ -86,10 +88,12 @@ class UserSerializer(serializers.ModelSerializer):
             doctor.email = doc_email
             doctor.save()
 
+
 class UserSimpleSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'username', 'first_name', 'last_name', 'email']
+
 
 class DoctorSerializer(serializers.ModelSerializer):
     user = UserSimpleSerializer(read_only=True)
@@ -102,21 +106,23 @@ class DoctorSerializer(serializers.ModelSerializer):
         ]
 
     def create(self, validated_data):
-        # create doctor user
-        user = User.objects.create_user(
-            username=validated_data['username'],
-            email=validated_data.get('email', ''),
-            password='123456',  # default password
-            first_name=validated_data.get('first_name', ''),
-            last_name=validated_data.get('last_name', ''),
-        )
-        # add to the doctor group
-        doctor_group, _ = Group.objects.get_or_create(name='Doctor')
-        user.groups.add(doctor_group)
+        try:
+            user = User.objects.create_user(
+                username=validated_data['username'],
+                email=validated_data.get('email', ''),
+                password='123456',
+                first_name=validated_data.get('first_name', ''),
+                last_name=validated_data.get('last_name', ''),
+            )
+            doctor_group, _ = Group.objects.get_or_create(name='Doctor')
+            user.groups.add(doctor_group)
 
-        # create doctor and related user
-        doctor = Doctor.objects.create(user=user, **validated_data)
-        return doctor
+            doctor = Doctor.objects.create(user=user, **validated_data)
+            return doctor
+        except IntegrityError:
+            raise ValidationError({'username': 'This username is already taken. Please choose another one.'})
+        except Exception as e:
+            raise ValidationError({'detail': str(e)})
 
     def update(self, instance, validated_data):
         instance = super().update(instance, validated_data)
@@ -128,6 +134,7 @@ class DoctorSerializer(serializers.ModelSerializer):
             user.email = instance.email
             user.save()
         return instance
+
 
 class AppointmentSlotSerializer(serializers.ModelSerializer):
     doctor = DoctorSerializer(read_only=True)

@@ -1,0 +1,38 @@
+services:
+  # Backend: Django REST API
+  - type: web
+    name: clinic-api
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: python manage.py migrate && python manage.py initadmin && gunicorn clinicappointmentsystem.wsgi:application --bind 0.0.0.0:$PORT
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: "False"
+      - key: DJANGO_SUPERUSER_USERNAME
+        value: admin
+      - key: DJANGO_SUPERUSER_EMAIL
+        value: admin@example.com
+      - key: DJANGO_SUPERUSER_PASSWORD
+        generateValue: true
+
+  # Frontend: React SPA (static site - free, no server process needed)
+  - type: web
+    name: clinic-frontend
+    runtime: static
+    rootDir: frontend
+    buildCommand: npm ci && npm run build
+    staticPublishPath: build
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      # IMPORTANT: must match the backend service's actual URL.
+      # Render names it https://<service-name>.onrender.com - verify in the
+      # dashboard after the first deploy and update this if different,
+      # then redeploy the frontend.
+      - key: REACT_APP_API_BASE_URL
+        value: https://clinic-api.onrender.com

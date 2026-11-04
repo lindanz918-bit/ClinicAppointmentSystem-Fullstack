@@ -1,5 +1,4 @@
-import React, {useState} from 'react';
-import {BrowserRouter as Router, Routes, Route} from 'react-router-dom';
+import axios from 'axios';
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import './App.css';
@@ -16,51 +15,93 @@ import AdminSlotForm from "./pages/AdminSlotForm";
 import AdminAddBooking from "./pages/AdminAddBooking";
 import AdminEditBooking from "./pages/AdminEditBooking";
 import AdminUserForm from "./pages/AdminUserForm";
+import DoctorDashboard from "./pages/DoctorDashboard";
+import {useEffect, useState} from "react";
+import PatientBookingList from "./pages/PatientBookingList";
+import { BrowserRouter as Router, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
+import AvailableSlots from "./pages/AvailableSlots";
+import PatientEditBooking from "./pages/PatientEditBooking";
 
-function App() {
-    // use null to simulate unlogged, use real login later
-    const [user, setUser] = useState(null);
 
-    const handleLogout = () => {
+function AppContent() {
+    const navigate = useNavigate();
+    const location = useLocation();
+
+    const [user, setUser] = useState(() => {
+        const saved = localStorage.getItem('user');
+        return saved ? JSON.parse(saved) : null;
+    });
+
+    useEffect(() => {
+        // if logged in and on home page, redirect based on role
+        if (location.pathname === '/' && user) {
+            if (user.is_staff || user.is_superuser) {
+                navigate('/admin/bookings');
+            } else if (user.doctor) {
+                navigate('/doctor/dashboard');
+            } else {
+                navigate('/my-bookings');
+            }
+        }
+    }, [user, location.pathname, navigate]);
+
+    const handleLogout = async () => {
+        try {
+            await axios.post(
+                `${process.env.REACT_APP_API_BASE_URL}/api/auth/logout/`,
+                {},
+                {withCredentials: true}
+            );
+        } catch (err) {
+            console.error(err);
+        }
+        localStorage.removeItem('user');
         setUser(null);
-        // call logout api
+        navigate('/login');
     };
 
     return (
-        <Router>
-            <div className="bg-light min-vh-100">
-                <Navbar user={user} onLogout={handleLogout}/>
-                <div className="container mb-5">
-                    <Routes>
-                        <Route path="/" element={<Home user={user}/>}/>
-                        {/* add routers here */}
-                        <Route path="/login" element={<Login setUser={setUser}/>}/>
-                        <Route path="/register" element={<Register/>}/>
-                        <Route path="/change-password" element={<ChangePassword user={user}/>}/>
-                        <Route path="/password-changed" element={<PasswordChanged user={user}/>}/>
-                        <Route path="/admin/bookings" element={<AdminBookingList/>}/>
-                        <Route path="/admin/bookings/add" element={<AdminAddBooking />} />
-                        <Route path="/admin/bookings/edit/:id" element={<AdminEditBooking />} />
+        <div className="bg-light min-vh-100">
+            <Navbar user={user} onLogout={handleLogout}/>
+            <div className="container mb-5">
+                <Routes>
+                    <Route path="/" element={<Home user={user}/>}/>
+                    <Route path="/login" element={<Login setUser={setUser}/>}/>
+                    <Route path="/register" element={<Register/>}/>
+                    <Route path="/change-password" element={<ChangePassword user={user}/>}/>
+                    <Route path="/password-changed" element={<PasswordChanged user={user}/>}/>
+                    <Route path="/admin/bookings" element={<AdminBookingList/>}/>
+                    <Route path="/admin/bookings/add" element={<AdminAddBooking/>}/>
+                    <Route path="/admin/bookings/edit/:id" element={<AdminEditBooking/>}/>
 
-                        <Route path="/admin/doctors" element={<AdminDoctorList/>}/>
-                        <Route path="/admin/doctors/add" element={<AdminDoctorForm/>}/>
-                        <Route path="/admin/doctors/edit/:id" element={<AdminDoctorForm/>}/>
+                    <Route path="/admin/doctors" element={<AdminDoctorList/>}/>
+                    <Route path="/admin/doctors/add" element={<AdminDoctorForm/>}/>
+                    <Route path="/admin/doctors/edit/:id" element={<AdminDoctorForm/>}/>
 
-                        <Route path="/admin/slots" element={<AdminSlotList/>}/>
-                        <Route path="/admin/slots/add" element={<AdminSlotForm/>}/>
-                        <Route path="/admin/slots/edit/:id" element={<AdminSlotForm/>}/>
+                    <Route path="/admin/slots" element={<AdminSlotList/>}/>
+                    <Route path="/admin/slots/add" element={<AdminSlotForm/>}/>
+                    <Route path="/admin/slots/edit/:id" element={<AdminSlotForm/>}/>
 
-                        <Route path="/admin/users" element={<AdminUserList/>}/>
-                        <Route path="/admin/users/add" element={<AdminUserForm/>}/>
-                        <Route path="/admin/users/edit/:id" element={<AdminUserForm/>}/>
+                    <Route path="/admin/users" element={<AdminUserList/>}/>
+                    <Route path="/admin/users/add" element={<AdminUserForm/>}/>
+                    <Route path="/admin/users/edit/:id" element={<AdminUserForm/>}/>
 
-                        <Route path="/login" element={<div>Login Page (coming soon)</div>}/>
-                        <Route path="/register" element={<div>Register Page (coming soon)</div>}/>
-                        <Route path="/available-slots" element={<div>Available Slots (coming soon)</div>}/>
-                        <Route path="/my-bookings" element={<div>My Bookings (coming soon)</div>}/>
-                    </Routes>
-                </div>
+                    <Route path="/doctor/dashboard" element={<DoctorDashboard/>}/>
+
+                    <Route path="/my-bookings" element={<PatientBookingList/>}/>
+                    <Route path="/available-slots" element={<AvailableSlots />} />
+                    <Route path="/my-bookings/edit/:id" element={<PatientEditBooking />} />
+
+                </Routes>
             </div>
+        </div>
+    );
+}
+
+function App() {
+    return (
+        <Router>
+            <AppContent/>
         </Router>
     );
 }

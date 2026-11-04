@@ -1,4 +1,4 @@
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.contrib.auth.models import User
 from rest_framework import status
 from rest_framework.authentication import SessionAuthentication
@@ -62,6 +62,7 @@ def register_view(request):
 
 
 @api_view(['POST'])
+@authentication_classes([CsrfExemptSessionAuthentication])
 @permission_classes([IsAuthenticated])
 def change_password_view(request):
     user = request.user
@@ -77,10 +78,15 @@ def change_password_view(request):
 
     user.set_password(new_password1)
     user.save()
+
+    # go to log in, keep session
+    update_session_auth_hash(request, user)
+
     return Response({'message': 'Password updated successfully'})
 
 
 @api_view(['POST'])
+@authentication_classes([CsrfExemptSessionAuthentication])
 @permission_classes([IsAuthenticated])
 def logout_view(request):
     logout(request)

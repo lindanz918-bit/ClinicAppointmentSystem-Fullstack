@@ -1,65 +1,132 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, {useState} from 'react';
+import {useNavigate} from 'react-router-dom';
 import axios from 'axios';
 
-function ChangePassword({ user }) {
-  const [form, setForm] = useState({ old_password: '', new_password1: '', new_password2: '' });
-  const [errors, setErrors] = useState({});
-  const navigate = useNavigate();
+function ChangePassword() {
+    const navigate = useNavigate();
+    const [oldPassword, setOldPassword] = useState('');
+    const [newPassword1, setNewPassword1] = useState('');
+    const [newPassword2, setNewPassword2] = useState('');
+    const [error, setError] = useState('');
+    const [success, setSuccess] = useState('');
 
-  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setError('');
+        setSuccess('');
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      await axios.post(`${process.env.REACT_APP_API_BASE_URL}/api/auth/change-password/`, form);
-      navigate('/password-changed');
-    } catch (err) {
-      setErrors(err.response?.data || {});
-    }
-  };
+        if (newPassword1 !== newPassword2) {
+            setError('New passwords do not match.');
+            return;
+        }
 
-  return (
-    <div className="row justify-content-center mt-4">
-      <div className="col-md-6 col-lg-5">
-        <div className="card shadow-sm border-0 rounded-3">
-          <div className="card-body p-4">
-            <h3 className="fw-bold text-primary mb-3">Change Password</h3>
-            <p className="text-muted small mb-4">
-              Please enter your old password, then enter and confirm your new password.
-            </p>
+        try {
+            await axios.post(
+                `${process.env.REACT_APP_API_BASE_URL}/api/auth/change-password/`,
+                {
+                    old_password: oldPassword,
+                    new_password1: newPassword1,
+                    new_password2: newPassword2,
+                },
+                {withCredentials: true}
+            );
+            setSuccess('Password updated successfully!');
+            setTimeout(() => {
+                const user = JSON.parse(localStorage.getItem('user') || '{}');
+                if (user.is_staff || user.is_superuser) {
+                    window.location.href = '/admin/bookings';
+                } else if (user.doctor) {
+                    window.location.href = '/doctor/dashboard';
+                } else {
+                    window.location.href = '/my-bookings';
+                }
+            }, 1500);
 
-            <form onSubmit={handleSubmit}>
-              {['old_password', 'new_password1', 'new_password2'].map((field) => (
-                <div className="mb-3" key={field}>
-                  <label className="form-label fw-bold">
-                    {field.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                  </label>
-                  <input
-                    type="password"
-                    name={field}
-                    className="form-control"
-                    value={form[field]}
-                    onChange={handleChange}
-                    required
-                  />
-                  {errors[field] && <div className="text-danger small">{errors[field]}</div>}
+        } catch (err) {
+            const data = err.response?.data;
+            if (data?.old_password) {
+                setError(data.old_password[0]);
+            } else if (data?.new_password2) {
+                setError(data.new_password2[0]);
+            } else {
+                setError('Failed to update password. Please try again.');
+            }
+        }
+    };
+
+    return (
+        <div className="row justify-content-center mt-5">
+            <div className="col-md-5">
+                <div className="card shadow border-0 rounded-3">
+                    <div className="card-body p-4">
+                        <h3 className="card-title text-center mb-3 text-primary fw-bold">Change Password</h3>
+                        <p className="text-muted text-center small mb-4">
+                            Please enter your old password, then enter and confirm your new password.
+                        </p>
+
+                        {error && (
+                            <div className="alert alert-danger py-2" role="alert">
+                                {error}
+                            </div>
+                        )}
+                        {success && (
+                            <div className="alert alert-success py-2" role="alert">
+                                {success}
+                            </div>
+                        )}
+
+                        <form onSubmit={handleSubmit}>
+                            <div className="mb-3">
+                                <label className="form-label fw-bold">Old Password</label>
+                                <input
+                                    type="password"
+                                    className="form-control"
+                                    value={oldPassword}
+                                    onChange={(e) => setOldPassword(e.target.value)}
+                                    required
+                                />
+                            </div>
+
+                            <div className="mb-3">
+                                <label className="form-label fw-bold">New Password</label>
+                                <input
+                                    type="password"
+                                    className="form-control"
+                                    value={newPassword1}
+                                    onChange={(e) => setNewPassword1(e.target.value)}
+                                    required
+                                />
+                            </div>
+
+                            <div className="mb-3">
+                                <label className="form-label fw-bold">Confirm Password</label>
+                                <input
+                                    type="password"
+                                    className="form-control"
+                                    value={newPassword2}
+                                    onChange={(e) => setNewPassword2(e.target.value)}
+                                    required
+                                />
+                            </div>
+
+                            <div className="d-flex justify-content-between">
+                                <button
+                                    type="button"
+                                    className="btn btn-outline-secondary"
+                                    onClick={() => navigate(-1)}
+                                >
+                                    Cancel
+                                </button>
+                                <button type="submit" className="btn btn-primary">
+                                    Update Password
+                                </button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
-              ))}
-              <div className="d-flex justify-content-between align-items-center mt-4">
-                <button type="button" className="btn btn-outline-secondary" onClick={() => navigate(-1)}>
-                  Cancel
-                </button>
-                <button type="submit" className="btn btn-primary fw-bold px-4">
-                  Update Password
-                </button>
-              </div>
-            </form>
-          </div>
+            </div>
         </div>
-      </div>
-    </div>
-  );
+    );
 }
 
 export default ChangePassword;
