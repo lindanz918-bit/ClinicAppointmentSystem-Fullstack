@@ -5,12 +5,13 @@ from rest_framework.authentication import SessionAuthentication
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
+from rest_framework_simplejwt.tokens import RefreshToken
+
 
 class CsrfExemptSessionAuthentication(SessionAuthentication):
     def enforce_csrf(self, request):
         return
 @api_view(['POST'])
-@authentication_classes([CsrfExemptSessionAuthentication])
 @permission_classes([AllowAny])
 def login_view(request):
     username = request.data.get('username')
@@ -18,7 +19,7 @@ def login_view(request):
 
     user = authenticate(request, username=username, password=password)
     if user is not None:
-        login(request, user)
+        refresh = RefreshToken.for_user(user)
         return Response({
             'user': {
                 'id': user.id,
@@ -29,10 +30,11 @@ def login_view(request):
                 'is_staff': user.is_staff,
                 'is_superuser': user.is_superuser,
                 'doctor': hasattr(user, 'doctor'),
-            }
+            },
+            'access': str(refresh.access_token),
+            'refresh': str(refresh),
         })
     return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
-
 
 @api_view(['POST'])
 @authentication_classes([CsrfExemptSessionAuthentication])

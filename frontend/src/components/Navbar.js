@@ -7,6 +7,19 @@ function Navbar({user, onLogout}) {
 
     const isActive = (path) => location.pathname === path ? 'active text-white' : 'text-white-50';
 
+    const handleLogout = async () => {
+        try {
+            await axios.post(`${process.env.REACT_APP_API_BASE_URL}/api/auth/logout/`);
+        } catch (err) {
+            console.error(err);
+        }
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('refresh_token');
+        localStorage.removeItem('user');
+        setUser(null);
+        navigate('/login');
+    };
+
     return (
         <nav className="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm mb-4">
             <div className="container">

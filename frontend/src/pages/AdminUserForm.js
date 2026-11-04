@@ -20,17 +20,13 @@ function AdminUserForm() {
 
     useEffect(() => {
         // load groups
-        axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/groups/`, {
-            withCredentials: true
-        })
+        axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/groups/`)
             .then(res => setGroups(res.data))
             .catch(err => console.error(err));
 
         // load user data
         if (isEdit) {
-            axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/users/${id}/`, {
-                withCredentials: true
-            })
+            axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/users/${id}/`)
                 .then(res => {
                     const user = res.data;
                     setForm({

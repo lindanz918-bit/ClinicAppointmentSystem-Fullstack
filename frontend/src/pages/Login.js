@@ -14,13 +14,16 @@ function Login({setUser}) {
         try {
             const res = await axios.post(
                 `${process.env.REACT_APP_API_BASE_URL}/api/auth/login/`,
-                {username, password},
-                {withCredentials: true}
+                {username, password}
             );
 
-            const user = res.data.user;
-            setUser(user);
+            const {user, access, refresh} = res.data;
+
+            // save token and user info
+            localStorage.setItem('access_token', access);
+            localStorage.setItem('refresh_token', refresh);
             localStorage.setItem('user', JSON.stringify(user));
+            setUser(user);
 
             // redirect based on user role
             if (user.is_staff || user.is_superuser) {
@@ -28,11 +31,9 @@ function Login({setUser}) {
             } else if (user.doctor) {
                 navigate('/doctor/dashboard');
             } else {
-                // Patient
                 navigate('/my-bookings');
             }
-        } catch
-            (err) {
+        } catch (err) {
             console.error(err);
             setError('Invalid username or password. Please try again.');
         }
