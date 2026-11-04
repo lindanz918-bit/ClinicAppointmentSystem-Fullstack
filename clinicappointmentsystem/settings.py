@@ -148,7 +148,7 @@ LOGOUT_REDIRECT_URL = 'login'
 # ]
 
 CSRF_TRUSTED_ORIGINS = [
-    'https://iscg7420wad-assignment1.onrender.com',
+    'https://clinicappointmentsystem-fullstack.onrender.com',
     'https://*.onrender.com',
     'http://127.0.0.1:3000',
     'http://localhost:3000',
@@ -162,7 +162,7 @@ SESSION_COOKIE_SAMESITE = 'Lax'
 
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",  # React default port
+    "https://clinicappointmentsystem-fullstack.onrender.com",  # React default port
     "http://127.0.0.1:3000",
 ]
 # Allow the deployed frontend (any *.onrender.com subdomain) to call the API
