@@ -199,4 +199,3 @@ if not DEBUG:
     SESSION_COOKIE_SECURE = True
 
 
-DEBUG = True
