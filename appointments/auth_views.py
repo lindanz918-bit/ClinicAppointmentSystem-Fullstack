@@ -33,7 +33,6 @@ def login_view(request):
     return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
 
 @api_view(['POST'])
-@authentication_classes([JWTAuthentication])
 @permission_classes([AllowAny])
 def register_view(request):
     username = request.data.get('username')
@@ -85,8 +84,7 @@ def change_password_view(request):
 
 @api_view(['POST'])
 @authentication_classes([JWTAuthentication])
-# @permission_classes([IsAuthenticated])
-@permission_classes([AllowAny])
+@permission_classes([IsAuthenticated])
 def logout_view(request):
     logout(request)
     return Response({'message': 'Logged out successfully'})

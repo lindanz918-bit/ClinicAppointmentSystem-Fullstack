@@ -20,8 +20,8 @@ class CsrfExemptSessionAuthentication(SessionAuthentication):
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all().order_by('-date_joined')
     serializer_class = UserSerializer
-    # permission_classes = [permissions.IsAdminUser]
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAdminUser]
+
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -136,20 +136,16 @@ class UserViewSet(viewsets.ModelViewSet):
 class GroupViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Group.objects.all()
     serializer_class = GroupSerializer
-    # permission_classes = [permissions.IsAdminUser]
-    permission_classes = [permissions.AllowAny]
-
+    permission_classes = [permissions.IsAdminUser]
 
 class DoctorViewSet(viewsets.ModelViewSet):
     queryset = Doctor.objects.all().order_by('id')
     serializer_class = DoctorSerializer
-    # permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     def get_permissions(self):
         if self.action in ['list', 'retrieve', 'me']:
-            # return [permissions.IsAuthenticated()]
-            return [permissions.AllowAny()]
+            return [permissions.IsAuthenticatedOrReadOnly()]
         return [permissions.IsAdminUser()]
 
     @action(detail=False, methods=['get'], url_path='me')
@@ -188,12 +184,11 @@ class DoctorViewSet(viewsets.ModelViewSet):
 class AppointmentSlotViewSet(viewsets.ModelViewSet):
     queryset = AppointmentSlot.objects.all()
     serializer_class = AppointmentSlotSerializer
-    # permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     def get_permissions(self):
         if self.action in ['list', 'retrieve']:
-            return [permissions.AllowAny()]
+            return [permissions.IsAuthenticatedOrReadOnly()]
         # admin only do create, update, delete
         return [permissions.IsAdminUser()]
 
@@ -211,30 +206,10 @@ class AppointmentSlotViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(is_booked=is_booked.lower() == 'true')
         return queryset
 
-
-# class BookingViewSet(viewsets.ModelViewSet):
-#     queryset = Booking.objects.all()
-#     serializer_class = BookingSerializer
-#     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-#     # permission_classes = [permissions.IsAuthenticated]
-#
-#     def perform_create(self, serializer):
-#         slot = serializer.validated_data['slot']
-#         slot.is_booked = True
-#         slot.save()
-#         serializer.save(patient=self.request.user)
-#
-#     def get_queryset(self):
-#         user = self.request.user
-#         if user.is_staff or hasattr(user, 'doctor'):
-#             return Booking.objects.all()
-#         return Booking.objects.filter(patient=user)
-
 class BookingViewSet(viewsets.ModelViewSet):
     queryset = Booking.objects.all()
     serializer_class = BookingSerializer
-    # permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
@@ -328,7 +303,7 @@ class BookingViewSet(viewsets.ModelViewSet):
                 print("=== Changing slot ===")
                 print("Old slot id:", old_slot.id, "is_booked:", old_slot.is_booked)
                 print("New slot id:", new_slot.id, "is_booked before:", new_slot.is_booked)
-                # ... 释放和占用的代码 ...
+                #
                 print("Old slot is_booked after:", old_slot.is_booked)
                 print("New slot is_booked after:", new_slot.is_booked)
 
