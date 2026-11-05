@@ -134,8 +134,10 @@ class DoctorViewSet(viewsets.ModelViewSet):
 
     def get_permissions(self):
         if self.action in ['list', 'retrieve', 'me']:
-            return [permissions.IsAuthenticated()]
+            # return [permissions.IsAuthenticated()]
+            return [permissions.AllowAny()]
         return [permissions.IsAdminUser()]
+
 
     @action(detail=False, methods=['get'], url_path='me')
     def me(self, request):
