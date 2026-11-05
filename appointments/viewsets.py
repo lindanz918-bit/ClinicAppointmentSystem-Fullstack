@@ -275,7 +275,13 @@ class BookingViewSet(viewsets.ModelViewSet):
 
     def partial_update(self, request, *args, **kwargs):
         try:
+
+            print("=== partial_update called ===")
+            print("Request data:", request.data)
             instance = self.get_object()
+            print("User:", instance.username)
+            print("Has doctor:", hasattr(instance, 'doctor'))
+
 
             # process doctor comments
             if 'doctor_comments' in request.data:
