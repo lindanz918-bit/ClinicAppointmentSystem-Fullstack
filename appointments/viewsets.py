@@ -92,7 +92,12 @@ class UserViewSet(viewsets.ModelViewSet):
         return Response({'detail': 'User suspended successfully.'})
 
     def partial_update(self, request, *args, **kwargs):
+
+        print("=== partial_update called ===")
+        print("Request data:", request.data)
         instance = self.get_object()
+        print("User:", instance.username)
+        print("Has doctor:", hasattr(instance, 'doctor'))
 
         # suspend user（is_active=False）
         if 'is_active' in request.data and request.data['is_active'] is False:
@@ -275,14 +280,7 @@ class BookingViewSet(viewsets.ModelViewSet):
 
     def partial_update(self, request, *args, **kwargs):
         try:
-
-            print("=== partial_update called ===")
-            print("Request data:", request.data)
             instance = self.get_object()
-            print("User:", instance.username)
-            print("Has doctor:", hasattr(instance, 'doctor'))
-
-
             # process doctor comments
             if 'doctor_comments' in request.data:
                 instance.doctor_comments = request.data.get('doctor_comments', '')
