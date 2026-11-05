@@ -124,6 +124,7 @@ class UserViewSet(viewsets.ModelViewSet):
             print("Future patient bookings:", patient_bookings.count())
 
             if future_bookings.exists() or patient_bookings.exists():
+                print("Blocking suspend")
                 return Response(
                     {'detail': 'Cannot suspend user with upcoming bookings.'},
                     status=status.HTTP_400_BAD_REQUEST
