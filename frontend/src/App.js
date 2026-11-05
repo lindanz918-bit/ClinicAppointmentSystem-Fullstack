@@ -62,7 +62,7 @@ function AppContent() {
 
     return (
         <div className="bg-light min-vh-100">
-            <Navbar user={user} onLogout={handleLogout}/>
+            <Navbar user={user} setUser={setUser} />
             <div className="container mb-5">
                 <Routes>
                     <Route path="/" element={<Home user={user}/>}/>

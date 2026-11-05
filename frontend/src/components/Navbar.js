@@ -1,9 +1,10 @@
 import React from 'react';
-import {Link, useLocation} from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import axios from "axios";
 
-function Navbar({user, onLogout}) {
-    console.log('Current user:', user);
+function Navbar({ user, setUser }) {
     const location = useLocation();
+    const navigate = useNavigate();
 
     const isActive = (path) => location.pathname === path ? 'active text-white' : 'text-white-50';
 
@@ -100,7 +101,7 @@ function Navbar({user, onLogout}) {
                                     </>
                                 )}
                                 <li className="nav-item">
-                                    <button onClick={onLogout}
+                                    <button onClick={handleLogout}
                                             className="btn btn-link nav-link text-white-50 p-0 border-0">
                                         Logout ({user.username})
                                     </button>
