@@ -67,6 +67,7 @@ class UserViewSet(viewsets.ModelViewSet):
 
         self.perform_destroy(instance)
         return Response(status=status.HTTP_204_NO_CONTENT)
+
     @action(detail=True, methods=['post'])
     def suspend(self, request, pk=None):
         user = self.get_object()
@@ -92,19 +93,16 @@ class UserViewSet(viewsets.ModelViewSet):
         return Response({'detail': 'User suspended successfully.'})
 
     def partial_update(self, request, *args, **kwargs):
-
         print("=== partial_update called ===")
         print("Request data:", request.data)
         instance = self.get_object()
         print("User:", instance.username)
         print("Has doctor:", hasattr(instance, 'doctor'))
 
-        # suspend user（is_active=False）
         if 'is_active' in request.data and request.data['is_active'] is False:
             now = timezone.now()
-
-            # check if there are future bookings
             future_bookings = Booking.objects.none()
+
             if hasattr(instance, 'doctor'):
                 future_bookings = Booking.objects.filter(
                     slot__doctor=instance.doctor,
@@ -114,9 +112,20 @@ class UserViewSet(viewsets.ModelViewSet):
                     slot__time__lt=now.time()
                 )
 
-            if future_bookings.exists():
+            patient_bookings = Booking.objects.filter(
+                patient=instance,
+                slot__date__gte=now.date()
+            ).exclude(
+                slot__date=now.date(),
+                slot__time__lt=now.time()
+            )
+
+            print("Future doctor bookings:", future_bookings.count())
+            print("Future patient bookings:", patient_bookings.count())
+
+            if future_bookings.exists() or patient_bookings.exists():
                 return Response(
-                    {'detail': 'Cannot suspend doctor with upcoming bookings.'},
+                    {'detail': 'Cannot suspend user with upcoming bookings.'},
                     status=status.HTTP_400_BAD_REQUEST
                 )
 
@@ -129,6 +138,7 @@ class GroupViewSet(viewsets.ReadOnlyModelViewSet):
     # permission_classes = [permissions.IsAdminUser]
     permission_classes = [permissions.AllowAny]
 
+
 class DoctorViewSet(viewsets.ModelViewSet):
     queryset = Doctor.objects.all().order_by('id')
     serializer_class = DoctorSerializer
@@ -140,7 +150,6 @@ class DoctorViewSet(viewsets.ModelViewSet):
             # return [permissions.IsAuthenticated()]
             return [permissions.AllowAny()]
         return [permissions.IsAdminUser()]
-
 
     @action(detail=False, methods=['get'], url_path='me')
     def me(self, request):
@@ -276,7 +285,6 @@ class BookingViewSet(viewsets.ModelViewSet):
             return queryset
 
         return queryset.filter(patient=user)
-
 
     def partial_update(self, request, *args, **kwargs):
         try:
