@@ -75,7 +75,7 @@ function AdminSlotList() {
                   <td>{slot.time}</td>
                   <td>
                     {expired ? (
-                      <span className="badge bg-secondary">Expired</span>
+                      <span className="badge bg-secondary">Completed / Expired</span>
                     ) : slot.is_booked ? (
                       <span className="badge bg-secondary">Booked</span>
                     ) : (

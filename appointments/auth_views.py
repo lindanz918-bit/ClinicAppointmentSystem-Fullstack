@@ -1,5 +1,5 @@
 from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -55,6 +55,10 @@ def register_view(request):
         first_name=first_name,
         last_name=last_name
     )
+
+    patient_group, _ = Group.objects.get_or_create(name='Patient')
+    user.groups.add(patient_group)
+
     return Response({'message': 'User created successfully'}, status=status.HTTP_201_CREATED)
 
 
