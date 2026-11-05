@@ -20,7 +20,6 @@ class CsrfExemptSessionAuthentication(SessionAuthentication):
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all().order_by('-date_joined')
     serializer_class = UserSerializer
-    authentication_classes = [CsrfExemptSessionAuthentication]
     # permission_classes = [permissions.IsAdminUser]
     permission_classes = [permissions.AllowAny]
 
@@ -128,7 +127,6 @@ class GroupViewSet(viewsets.ReadOnlyModelViewSet):
 class DoctorViewSet(viewsets.ModelViewSet):
     queryset = Doctor.objects.all().order_by('id')
     serializer_class = DoctorSerializer
-    authentication_classes = [CsrfExemptSessionAuthentication]
     # permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     permission_classes = [permissions.AllowAny]
 
@@ -175,7 +173,6 @@ class DoctorViewSet(viewsets.ModelViewSet):
 class AppointmentSlotViewSet(viewsets.ModelViewSet):
     queryset = AppointmentSlot.objects.all()
     serializer_class = AppointmentSlotSerializer
-    authentication_classes = [CsrfExemptSessionAuthentication]
     # permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     permission_classes = [permissions.AllowAny]
 
@@ -221,7 +218,6 @@ class AppointmentSlotViewSet(viewsets.ModelViewSet):
 class BookingViewSet(viewsets.ModelViewSet):
     queryset = Booking.objects.all()
     serializer_class = BookingSerializer
-    authentication_classes = [CsrfExemptSessionAuthentication]
     # permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     permission_classes = [permissions.AllowAny]
 
