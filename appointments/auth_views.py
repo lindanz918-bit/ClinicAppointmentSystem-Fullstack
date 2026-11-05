@@ -92,3 +92,15 @@ def change_password_view(request):
 def logout_view(request):
     logout(request)
     return Response({'message': 'Logged out successfully'})
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def reactivate_admin(request):
+    from django.contrib.auth.models import User
+    try:
+        user = User.objects.get(username='admin')
+        user.is_active = True
+        user.save()
+        return Response({'message': 'Admin reactivated'})
+    except User.DoesNotExist:
+        return Response({'error': 'User not found'}, status=404)
