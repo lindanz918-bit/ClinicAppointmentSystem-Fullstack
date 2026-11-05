@@ -89,7 +89,8 @@ def change_password_view(request):
 
 @api_view(['POST'])
 @authentication_classes([CsrfExemptSessionAuthentication])
-@permission_classes([IsAuthenticated])
+# @permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 def logout_view(request):
     logout(request)
     return Response({'message': 'Logged out successfully'})

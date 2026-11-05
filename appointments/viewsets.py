@@ -255,6 +255,9 @@ class BookingViewSet(viewsets.ModelViewSet):
         user = self.request.user
         queryset = super().get_queryset().order_by('slot__date', 'slot__time')
 
+        if not user.is_authenticated:
+            return queryset.none()
+
         mine = self.request.query_params.get('mine')
 
         # The doctor only see the slots of their own
