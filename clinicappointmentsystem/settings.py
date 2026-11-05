@@ -156,11 +156,14 @@ CSRF_TRUSTED_ORIGINS = [
     'http://localhost:8000',
 ]
 
-CSRF_COOKIE_SAMESITE = 'Lax'
-SESSION_COOKIE_SAMESITE = 'Lax'
-
-
+SESSION_COOKIE_SAMESITE = 'None'
+CSRF_COOKIE_SAMESITE = 'None'
 CORS_ALLOW_CREDENTIALS = True
+
+if not DEBUG:
+    CSRF_COOKIE_SECURE = True
+    SESSION_COOKIE_SECURE = True
+
 CORS_ALLOWED_ORIGINS = [
     "https://clinicappointmentsystem-fullstack.onrender.com",  # React default port
     "http://127.0.0.1:3000",
@@ -169,15 +172,6 @@ CORS_ALLOWED_ORIGINS = [
 CORS_ALLOWED_ORIGIN_REGEXES = [
     r'^https://[a-z0-9-]+\.onrender\.com$',
 ]
-
-# REST_FRAMEWORK = {
-#     'DEFAULT_AUTHENTICATION_CLASSES': [
-#         'rest_framework.authentication.SessionAuthentication',
-#     ],
-#     'DEFAULT_PERMISSION_CLASSES': [
-#         'rest_framework.permissions.IsAuthenticatedOrReadOnly',
-#     ]
-# }
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
@@ -193,9 +187,5 @@ SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
 }
-
-if not DEBUG:
-    CSRF_COOKIE_SECURE = True
-    SESSION_COOKIE_SECURE = True
 
 

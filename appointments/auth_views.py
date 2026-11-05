@@ -1,16 +1,12 @@
 from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.contrib.auth.models import User
 from rest_framework import status
-from rest_framework.authentication import SessionAuthentication
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
+from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.tokens import RefreshToken
 
-
-class CsrfExemptSessionAuthentication(SessionAuthentication):
-    def enforce_csrf(self, request):
-        return
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def login_view(request):
@@ -37,7 +33,7 @@ def login_view(request):
     return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
 
 @api_view(['POST'])
-@authentication_classes([CsrfExemptSessionAuthentication])
+@authentication_classes([JWTAuthentication])
 @permission_classes([AllowAny])
 def register_view(request):
     username = request.data.get('username')
@@ -64,7 +60,7 @@ def register_view(request):
 
 
 @api_view(['POST'])
-@authentication_classes([CsrfExemptSessionAuthentication])
+@authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
 def change_password_view(request):
     user = request.user
@@ -88,7 +84,7 @@ def change_password_view(request):
 
 
 @api_view(['POST'])
-@authentication_classes([CsrfExemptSessionAuthentication])
+@authentication_classes([JWTAuthentication])
 # @permission_classes([IsAuthenticated])
 @permission_classes([AllowAny])
 def logout_view(request):

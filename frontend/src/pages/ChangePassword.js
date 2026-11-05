@@ -21,14 +21,19 @@ function ChangePassword() {
         }
 
         try {
+            const access = localStorage.getItem('access_token');
             await axios.post(
-                `${process.env.REACT_APP_API_BASE_URL}/api/auth/change-password/`,
+            `${process.env.REACT_APP_API_BASE_URL}/api/auth/change-password/`,
                 {
-                    old_password: oldPassword,
-                    new_password1: newPassword1,
-                    new_password2: newPassword2,
-                },
-                {withCredentials: true}
+                        old_password: oldPassword,
+                        new_password1: newPassword1,
+                        new_password2: newPassword2,
+                    },
+            {
+                    headers: {
+                        Authorization: `Bearer ${access}`
+                    }
+                   }
             );
             setSuccess('Password updated successfully!');
             setTimeout(() => {
