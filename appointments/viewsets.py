@@ -199,6 +199,19 @@ class AppointmentSlotViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(date=date)
         if is_booked is not None:
             queryset = queryset.filter(is_booked=is_booked.lower() == 'true')
+
+        # filter the overdue slots for patient  available slots
+        user = self.request.user
+        if not (user.is_staff or user.is_superuser):
+            from django.utils import timezone
+            now = timezone.now()
+            queryset = queryset.filter(
+                date__gt=now.date()
+            ) | queryset.filter(
+                date=now.date(),
+                time__gte=now.time()
+            )
+
         return queryset
 
 class BookingViewSet(viewsets.ModelViewSet):
