@@ -2,15 +2,12 @@ from django.db import IntegrityError
 from rest_framework import serializers
 from django.contrib.auth.models import User, Group
 from rest_framework.exceptions import ValidationError
-
 from .models import Doctor, AppointmentSlot, Booking
-
 
 class GroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = Group
         fields = ['id', 'name']
-
 
 class UserSerializer(serializers.ModelSerializer):
     groups = GroupSerializer(many=True, read_only=True)
@@ -31,7 +28,7 @@ class UserSerializer(serializers.ModelSerializer):
         user = User.objects.create_user(
             username=validated_data['username'],
             email=validated_data.get('email', ''),
-            password='123456',  # 默认密码
+            password='123456',  # default password
             first_name=validated_data.get('first_name', ''),
             last_name=validated_data.get('last_name', ''),
         )

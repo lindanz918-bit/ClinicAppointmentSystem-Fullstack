@@ -11,20 +11,17 @@ from .serializers import (
     BookingSerializer, UserSerializer, GroupSerializer
 )
 
-
-class CsrfExemptSessionAuthentication(SessionAuthentication):
-    def enforce_csrf(self, request):
-        return
-
-
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all().order_by('-date_joined')
     serializer_class = UserSerializer
     permission_classes = [permissions.IsAdminUser]
 
-
     def get_queryset(self):
         queryset = super().get_queryset()
+
+        # hide admin
+        queryset = queryset.exclude(is_staff=True).exclude(is_superuser=True)
+
         group = self.request.query_params.get('group')
         if group:
             queryset = queryset.filter(groups__name=group)
@@ -132,7 +129,6 @@ class UserViewSet(viewsets.ModelViewSet):
 
         return super().partial_update(request, *args, **kwargs)
 
-
 class GroupViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Group.objects.all()
     serializer_class = GroupSerializer
@@ -179,7 +175,6 @@ class DoctorViewSet(viewsets.ModelViewSet):
             instance.user.delete()
         self.perform_destroy(instance)
         return Response(status=status.HTTP_204_NO_CONTENT)
-
 
 class AppointmentSlotViewSet(viewsets.ModelViewSet):
     queryset = AppointmentSlot.objects.all()
