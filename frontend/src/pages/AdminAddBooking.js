@@ -34,15 +34,22 @@ function AdminAddBooking() {
 
   // load slots for selected doctor
   useEffect(() => {
-    if (selectedDoctor) {
-      axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/slots/?doctor=${selectedDoctor}&is_booked=false`)
-        .then(res => setSlots(res.data))
-        .catch(err => console.error(err));
-    } else {
-      setSlots([]);
-      setSelectedSlot('');
-    }
-  }, [selectedDoctor]);
+  if (selectedDoctor) {
+    axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/slots/?doctor=${selectedDoctor}&is_booked=false`)
+      .then(res => {
+        const now = new Date();
+        // filter overdue slots for admin
+        const futureSlots = res.data.filter(slot => {
+          const slotDateTime = new Date(`${slot.date}T${slot.time}`);
+          return slotDateTime >= now;
+        });
+        setSlots(futureSlots);
+      })
+      .catch(err => console.error(err));
+  } else {
+    setSlots([]);
+  }
+}, [selectedDoctor]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
