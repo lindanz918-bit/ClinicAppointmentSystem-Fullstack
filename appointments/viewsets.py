@@ -202,15 +202,21 @@ class AppointmentSlotViewSet(viewsets.ModelViewSet):
 
         # filter the overdue slots for patient  available slots
         user = self.request.user
+        print("=== Slot get_queryset ===")
+        print("User:", user.username if user.is_authenticated else "Anonymous")
+        print("is_staff:", user.is_staff)
+        print("is_superuser:", user.is_superuser)
+
         if not (user.is_staff or user.is_superuser):
-            from django.utils import timezone
             now = timezone.now()
+            print("Filtering expired slots. Now =", now)
             queryset = queryset.filter(
                 date__gt=now.date()
             ) | queryset.filter(
                 date=now.date(),
                 time__gte=now.time()
             )
+            print("After filter count:", queryset.count())
 
         return queryset
 
