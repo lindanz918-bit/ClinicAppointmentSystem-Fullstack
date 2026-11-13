@@ -208,15 +208,14 @@ class AppointmentSlotViewSet(viewsets.ModelViewSet):
         print("is_superuser:", user.is_superuser)
 
         if not (user.is_staff or user.is_superuser):
-            now = timezone.now()
-            print("Filtering expired slots. Now =", now)
+            now = timezone.localtime(timezone.now())  # transfer to local time
+            print("Local time:", now)
             queryset = queryset.filter(
                 date__gt=now.date()
             ) | queryset.filter(
                 date=now.date(),
                 time__gte=now.time()
             )
-            print("After filter count:", queryset.count())
 
         return queryset
 
